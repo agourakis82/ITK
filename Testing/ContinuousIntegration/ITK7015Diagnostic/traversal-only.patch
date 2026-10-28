@@ -1,0 +1,33 @@
+diff --git a/Modules/Video/Core/test/itkImageToVideoFilterTest.cxx b/Modules/Video/Core/test/itkImageToVideoFilterTest.cxx
+--- a/Modules/Video/Core/test/itkImageToVideoFilterTest.cxx
++++ b/Modules/Video/Core/test/itkImageToVideoFilterTest.cxx
+@@ -28 +28 @@
+-#include "itkImageSliceConstIteratorWithIndex.h"
++#include "itkImageRegionConstIteratorWithIndex.h"
+@@ -113 +113 @@
+-  using ImageIteratorType = itk::ImageSliceConstIteratorWithIndex<ImageType>;
++  using ImageIteratorType = itk::ImageRegionConstIteratorWithIndex<ImageType>;
+@@ -115,5 +115 @@
+-  it.SetFirstDirection(1);  // fastest moving remaining spatial axis
+-  it.SetSecondDirection(2); // second-fastest moving remaining spatial axis
+-  it.GoToBegin();
+-
+-  while (!it.IsAtEnd())
++  for (it.GoToBegin(); !it.IsAtEnd(); ++it)
+@@ -121,13 +117,3 @@
+-    while (!it.IsAtEndOfSlice())
+-    {
+-      while (!it.IsAtEndOfLine())
+-      {
+-        auto idx = it.GetIndex();
+-        auto frame = videoOutput->GetFrame(idx[frameAxis]);
+-        ITK_TEST_EXPECT_EQUAL(frame->GetPixel(itk::MakeIndex(idx[1], idx[2])), it.Get());
+-
+-        ++it;
+-      }
+-      it.NextLine();
+-    }
+-    it.NextSlice();
++    auto idx = it.GetIndex();
++    auto frame = videoOutput->GetFrame(idx[frameAxis]);
++    ITK_TEST_EXPECT_EQUAL(frame->GetPixel(itk::MakeIndex(idx[1], idx[2])), it.Get());

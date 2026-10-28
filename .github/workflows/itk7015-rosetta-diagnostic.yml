@@ -1,8 +1,8 @@
-name: ITK7015 Rosetta Native Diagnostic
+name: ITK7015 Internal Target C++23 Diagnostic
 
 on:
   push:
-    branches: [diagnostic/itk7015-rosetta-20261028]
+    branches: [diagnostic/itk7015-internal-cxx23-20261028]
   workflow_dispatch:
 
 permissions:
@@ -12,7 +12,7 @@ jobs:
   original-case:
     if: github.repository == 'agourakis82/ITK'
     runs-on: macos-15
-    timeout-minutes: 30
+    timeout-minutes: 90
     strategy:
       fail-fast: false
       matrix:
@@ -40,7 +40,27 @@ jobs:
         env:
           ITK7015_CASE: ${{ matrix.label }}
           ITK7015_SOURCE_REF: ${{ matrix.source_ref }}
-        run: bash Testing/ContinuousIntegration/ITK7015Diagnostic/run-canonical-driver.sh
+        run: bash Testing/ContinuousIntegration/ITK7015Diagnostic/run-internal-driver.sh
+      - name: Preserve small diagnostic receipts
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: itk7015-internal-summary-${{ matrix.label }}-${{ github.run_id }}
+          path: |
+            diagnostic-out/${{ matrix.label }}/*.txt
+            diagnostic-out/${{ matrix.label }}/*.exit
+            diagnostic-out/${{ matrix.label }}/*.diff
+            diagnostic-out/${{ matrix.label }}/*/ctest.log
+            diagnostic-out/${{ matrix.label }}/*/ctest.exit
+            diagnostic-out/${{ matrix.label }}/*/output-byte-comparison.*
+            diagnostic-out/${{ matrix.label }}/*/native-identities.sha256
+            diagnostic-out/${{ matrix.label }}/*/runtime-input-identities.sha256
+            diagnostic-out/${{ matrix.label }}/*/internal-command-graph.txt
+            diagnostic-out/${{ matrix.label }}/*/configure-execute-process.json
+            diagnostic-out/${{ matrix.label }}/*/CMakeCache.txt
+            diagnostic-out/${{ matrix.label }}/*/planned-neighbor-registrations.json
+          if-no-files-found: error
+          retention-days: 7
       - name: Preserve native witness and build receipts
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
