@@ -19,7 +19,7 @@ test -z "$(git -C "$source_root" status --porcelain)"
 
 # An independent build preserves the earlier minimal-module artifact unchanged.
 "$cmake" -S "$source_root" -B "$build" -G Ninja \
-  -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_STANDARD=23 -DCMAKE_CXX_STANDARD_REQUIRED=ON \
+  -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_STANDARD=17 -DCMAKE_CXX_STANDARD_REQUIRED=ON \
   -DCMAKE_CXX_EXTENSIONS=OFF -DCMAKE_OSX_ARCHITECTURES=x86_64 \
   -DCMAKE_OSX_SYSROOT="$sdk_path" \
   -DCMAKE_C_COMPILER="$c_compiler" -DCMAKE_CXX_COMPILER="$compiler" \

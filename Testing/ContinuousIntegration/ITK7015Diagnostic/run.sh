@@ -37,7 +37,7 @@ cat > "$out/scope.txt" <<'EOF'
 The original failing CI used macos-15, Apple clang 17.0.0 (clang-1700.0.13.5), and Xcode_16.4.
 This diagnostic requires that compiler build, an arm64 host, and translated x86_64 execution.
 The runner image, macOS patch build, and SDK are recorded but not pinned to the historical image.
-This focused diagnostic requires C++23 under ADR009; the original CI did not override ITK's C++17 default.
+This C++17 diagnostic is authorized by a narrow ADR009 exception for these two source revisions.
 It builds only native VideoCore/IOMeta dependencies and the unchanged original test outside the full CTest driver.
 An isolated pass does not establish that the original full CI failure was a flake or has been repaired.
 EOF
@@ -75,7 +75,7 @@ cp "$harness/main.cxx" "$harness/CMakeLists.txt" "$out/"
 ruby "$harness/prepare-diagnostic.rb" "$original" "$out/diagnostic-test.cxx"
 
 "$cmake" -S "$source_root" -B "$build" -G Ninja \
-  -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_STANDARD=23 -DCMAKE_CXX_STANDARD_REQUIRED=ON \
+  -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_STANDARD=17 -DCMAKE_CXX_STANDARD_REQUIRED=ON \
   -DCMAKE_CXX_EXTENSIONS=OFF -DCMAKE_OSX_ARCHITECTURES=x86_64 \
   -DCMAKE_OSX_SYSROOT="$sdk_path" \
   -DCMAKE_C_COMPILER="$c_compiler" -DCMAKE_CXX_COMPILER="$compiler" \

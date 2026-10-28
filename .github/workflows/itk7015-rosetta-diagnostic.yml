@@ -1,8 +1,8 @@
-name: ITK7015 Rosetta Native Diagnostic
+name: ITK7015 Rosetta C++17 Diagnostic
 
 on:
   push:
-    branches: [diagnostic/itk7015-rosetta-20261028]
+    branches: [diagnostic/itk7015-rosetta-cxx17-20261028]
   workflow_dispatch:
 
 permissions:
