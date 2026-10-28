@@ -41,7 +41,9 @@ This focused diagnostic requires C++23 under ADR009; the original CI did not ove
 It builds only native VideoCore/IOMeta dependencies and the unchanged original test outside the full CTest driver.
 An isolated pass does not establish that the original full CI failure was a flake or has been repaired.
 EOF
-xcrun --sdk macosx --show-sdk-path > "$out/sdk.txt"
+sdk_path="$(xcrun --sdk macosx --show-sdk-path)"
+test -d "$sdk_path"
+printf '%s\n' "$sdk_path" > "$out/sdk.txt"
 xcrun --sdk macosx --show-sdk-version >> "$out/sdk.txt"
 
 curl --fail --location --retry 2 --max-time 180 \
@@ -75,6 +77,7 @@ ruby "$harness/prepare-diagnostic.rb" "$original" "$out/diagnostic-test.cxx"
 "$cmake" -S "$source_root" -B "$build" -G Ninja \
   -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_STANDARD=23 -DCMAKE_CXX_STANDARD_REQUIRED=ON \
   -DCMAKE_CXX_EXTENSIONS=OFF -DCMAKE_OSX_ARCHITECTURES=x86_64 \
+  -DCMAKE_OSX_SYSROOT="$sdk_path" \
   -DCMAKE_C_COMPILER="$c_compiler" -DCMAKE_CXX_COMPILER="$compiler" \
   -DITK_BUILD_DEFAULT_MODULES=OFF -DModule_ITKVideoCore=ON -DModule_ITKIOMeta=ON \
   -DBUILD_TESTING=OFF -DBUILD_EXAMPLES=OFF -DITK_BUILD_DOCUMENTATION=OFF \
@@ -89,6 +92,7 @@ cp "$build/CMakeCache.txt" "$out/library-CMakeCache.txt"
 
 "$cmake" -S "$harness" -B "$native_build" -G Ninja \
   -DCMAKE_BUILD_TYPE=Release -DCMAKE_OSX_ARCHITECTURES=x86_64 \
+  -DCMAKE_OSX_SYSROOT="$sdk_path" \
   -DCMAKE_CXX_COMPILER="$compiler" -DITK_DIR="$build" \
   -DITK7015_SOURCE_ROOT="$source_root" -DITK7015_DIAGNOSTIC_SOURCE="$out/diagnostic-test.cxx" \
   2>&1 | tee "$out/native-configure.log"
