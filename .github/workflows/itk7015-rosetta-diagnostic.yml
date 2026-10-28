@@ -40,7 +40,7 @@ jobs:
         env:
           ITK7015_CASE: ${{ matrix.label }}
           ITK7015_SOURCE_REF: ${{ matrix.source_ref }}
-        run: bash Testing/ContinuousIntegration/ITK7015Diagnostic/run.sh
+        run: bash Testing/ContinuousIntegration/ITK7015Diagnostic/run-canonical-driver.sh
       - name: Preserve native witness and build receipts
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
