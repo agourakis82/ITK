@@ -1,0 +1,52 @@
+name: ITK7015 Rosetta Native Diagnostic
+
+on:
+  push:
+    branches: [diagnostic/itk7015-rosetta-20261028]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  original-case:
+    if: github.repository == 'agourakis82/ITK'
+    runs-on: macos-15
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - label: base
+            source_ref: 3f19582d1686ea86c1522f6e1610b585bea09361
+          - label: candidate
+            source_ref: 17185fa89dc815c3a5a48e0b2694305e49e0758b
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_16.4.app/Contents/Developer
+    steps:
+      - name: Check out diagnostic harness
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          persist-credentials: false
+      - name: Check out exact test source
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          repository: InsightSoftwareConsortium/ITK
+          ref: ${{ matrix.source_ref }}
+          path: exact-source
+          persist-credentials: false
+      - name: Build and execute the original native case
+        shell: bash
+        env:
+          ITK7015_CASE: ${{ matrix.label }}
+          ITK7015_SOURCE_REF: ${{ matrix.source_ref }}
+        run: bash Testing/ContinuousIntegration/ITK7015Diagnostic/run.sh
+      - name: Preserve native witness and build receipts
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: itk7015-rosetta-${{ matrix.label }}-${{ github.run_id }}
+          path: diagnostic-out/${{ matrix.label }}/
+          if-no-files-found: error
+          retention-days: 7
+          compression-level: 6
